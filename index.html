@@ -7,21 +7,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f172a">
-<meta name="description" content="Click to Call via Twilio">
-<title>📞 Dialer</title>
+<title>📞 Click to Call</title>
 <link rel="manifest" href="manifest.json">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0f1e;color:#e2e8f0;min-height:100dvh;min-height:-webkit-fill-available;display:flex;flex-direction:column;max-width:520px;margin:0 auto;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0f1e;color:#e2e8f0;min-height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 .header{padding:20px 16px 12px;text-align:center}
 .header h1{font-size:1.1rem;font-weight:600;color:#f1f5f9;letter-spacing:-0.01em}
 .header .tag{font-size:0.7rem;color:#475569;margin-top:2px}
-.settings-row{display:flex;gap:8px;align-items:center;padding:0 16px 8px;justify-content:center;flex-wrap:wrap}
-.settings-row input{padding:10px 12px;font-size:0.9rem;border:1.5px solid #1e293b;border-radius:10px;background:#111827;color:#e2e8f0;text-align:center;width:140px;outline:none;font-family:monospace}
+.settings-row{display:flex;gap:6px;align-items:center;padding:0 16px 8px;justify-content:center;flex-wrap:wrap}
+.settings-row input{padding:10px 12px;font-size:0.85rem;border:1.5px solid #1e293b;border-radius:10px;background:#111827;color:#e2e8f0;text-align:center;width:140px;outline:none;font-family:monospace}
 .settings-row input:focus{border-color:#3b82f6}
-.settings-row .pin{width:70px}
-.settings-row button{padding:10px 14px;font-size:0.8rem;border:none;border-radius:10px;background:#1e293b;color:#94a3b8;cursor:pointer;font-weight:500}
+.settings-row .pin{width:60px}
+.settings-row button{padding:10px 14px;font-size:0.75rem;border:none;border-radius:10px;background:#1e293b;color:#94a3b8;cursor:pointer;font-weight:500}
 .settings-row button:active{background:#334155}
 .settings-row label{font-size:0.7rem;color:#64748b}
 .dialer-area{flex:1;display:flex;flex-direction:column;padding:8px 16px 16px}
@@ -55,37 +54,57 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .add-contact:active{background:#111827}
 .empty{color:#334155;text-align:center;padding:16px;font-size:0.8rem}
 .footer{text-align:center;padding:12px;color:#1e293b;font-size:0.65rem;border-top:1px solid #0f172a}
-.setup-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+.setup-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:12px;text-align:center}
 .setup-screen h2{font-size:1rem;color:#94a3b8;font-weight:400}
-.setup-screen input{padding:14px;font-size:1.1rem;border:2px solid #1e293b;border-radius:12px;background:#111827;color:#e2e8f0;text-align:center;width:100%;max-width:260px;outline:none;font-family:monospace}
+.setup-screen p{color:#64748b;font-size:0.75rem;max-width:280px}
+.setup-screen input{padding:12px;font-size:1rem;border:2px solid #1e293b;border-radius:12px;background:#111827;color:#e2e8f0;text-align:center;width:100%;max-width:260px;outline:none;font-family:monospace}
 .setup-screen input:focus{border-color:#3b82f6}
 .setup-screen button{padding:14px 40px;font-size:1rem;border:none;border-radius:12px;background:#3b82f6;color:#fff;font-weight:600;cursor:pointer}
 .setup-screen button:active{background:#2563eb}
-.setup-screen .skip{color:#475569;font-size:0.8rem;cursor:pointer}
+.setup-screen .skip{color:#475569;font-size:0.75rem;cursor:pointer}
+.setup-screen .hint{color:#334155;font-size:0.65rem;text-align:left;max-width:260px;line-height:1.5}
+.setup-screen .hint a{color:#3b82f6}
+summary{color:#3b82f6;font-size:0.7rem;cursor:pointer;padding:8px 0}
+details{width:100%;max-width:260px}
 </style>
 </head>
 <body>
 
-<!-- Setup screen (first visit) -->
 <div id="setupScreen" class="setup-screen" style="display:none">
-  <h2>📞 Enter your mobile number</h2>
-  <p style="color:#64748b;font-size:0.8rem;text-align:center">Twilio will call this number<br>then connect to your destination</p>
-  <input type="tel" id="setupMobile" placeholder="+614XXXXXXXX" autocomplete="tel">
-  <button onclick="saveSetup()">Save &amp; Continue</button>
-  <span class="skip" onclick="skipSetup()">I'll set it later</span>
+  <h2>🔐 One-Time Setup</h2>
+  <p>Enter your Twilio credentials. Stored only in this browser.</p>
+  
+  <input type="text" id="setupSid" placeholder="Account SID (AC...)" autocomplete="off">
+  <input type="text" id="setupKey" placeholder="API Key SID (SK...)" autocomplete="off">
+  <input type="password" id="setupSecret" placeholder="API Key Secret" autocomplete="off">
+  <input type="tel" id="setupCaller" placeholder="Twilio Number (+614...)" autocomplete="off">
+  <input type="tel" id="setupMobile" placeholder="Your Mobile (+614...)" autocomplete="tel">
+  <input type="password" id="setupPin" placeholder="Security PIN (4-6 digits)" maxlength="6" autocomplete="off">
+  
+  <details><summary>Where do I find these?</summary>
+  <div class="hint">
+    <b>Account SID:</b> Twilio Console → Account Info<br>
+    <b>API Key:</b> Create at <a href="https://console.twilio.com/us1/account/keys-&-credentials/api-keys" target="_blank">API Keys page</a><br>
+    <b>Caller ID:</b> Your Twilio phone number<br>
+    <b>Your Mobile:</b> Number Twilio rings you on<br>
+    🔒 Everything stays in your browser
+  </div></details>
+  
+  <button onclick="saveSetup()">💾 Save &amp; Start</button>
+  <span class="skip" onclick="skipSetup()">Skip (I'll configure in settings)</span>
 </div>
 
-<!-- Main dialer -->
 <div id="mainApp" style="display:flex;flex-direction:column;flex:1">
   <div class="header">
     <h1>📞 Click to Call</h1>
     <div class="tag">via Twilio</div>
   </div>
   <div class="settings-row">
-    <label>Your #:</label>
-    <input type="tel" id="mobileInput" placeholder="+614XXXXXXXX" autocomplete="tel">
+    <label>Mobile:</label>
+    <input type="tel" id="mobileInput" placeholder="+614..." autocomplete="tel">
     <label>PIN:</label>
-    <input type="password" class="pin" id="pinInput" maxlength="6" placeholder="0000" autocomplete="off">
+    <input type="password" class="pin" id="pinInput" maxlength="6" placeholder="PIN" autocomplete="off">
+    <button onclick="showSetup()" title="Settings">⚙️</button>
   </div>
   <div class="dialer-area">
     <div class="display">
@@ -113,61 +132,75 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="status" id="status"></div>
   </div>
   <div class="sections">
-    <div class="section">
-      <div class="section-title">⭐ Saved</div>
-      <div id="contactsList"></div>
-      <div class="add-contact" onclick="addContact()">+ Add Contact</div>
-    </div>
-    <div class="section">
-      <div class="section-title">🕐 Recent</div>
-      <div id="recentList"><div class="empty">No recent calls</div></div>
-    </div>
+    <div class="section"><div class="section-title">⭐ Saved</div><div id="contactsList"></div><div class="add-contact" onclick="addContact()">+ Add Contact</div></div>
+    <div class="section"><div class="section-title">🕐 Recent</div><div id="recentList"><div class="empty">No recent calls</div></div></div>
   </div>
-  <div class="footer">Calls made from your Twilio number</div>
+  <div class="footer">Everything stored locally in your browser 🔒</div>
 </div>
 
 <script>
-// ===== CONFIG =====
-const ACCOUNT_SID = 'ACf6d73ea3483cc85272a19faa8e01dc15';
-const API_KEY = 'SKf01ec049898c76a4d0e21488a3134ece';
-const API_SECRET = 'sDd2XCcWMaYDlmqj758yLY26ljmTTMTm';
-const CALLER_ID = '+61468004468';
-
-// ===== STATE =====
 let enteredDigits = '+61';
 
-// ===== SETUP =====
 function init() {
-  const mobile = localStorage.getItem('dialer_mobile');
-  if (!mobile) {
-    document.getElementById('setupScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
+  const sid = localStorage.getItem('dc_sid');
+  if (!sid) {
+    showSetup();
   } else {
-    document.getElementById('setupScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
-    document.getElementById('mobileInput').value = mobile;
-    document.getElementById('pinInput').value = localStorage.getItem('dialer_pin') || '';
+    hideSetup();
+    document.getElementById('mobileInput').value = localStorage.getItem('dc_mobile') || '';
+    document.getElementById('pinInput').value = localStorage.getItem('dc_pin') || '';
   }
   updateDisplay();
   renderContacts();
   renderRecent();
 }
 
-function saveSetup() {
-  const mobile = document.getElementById('setupMobile').value.trim();
-  if (!mobile || mobile.length < 6) { alert('Enter a valid mobile number'); return; }
-  localStorage.setItem('dialer_mobile', mobile);
+function showSetup() {
+  document.getElementById('setupScreen').style.display = 'flex';
+  document.getElementById('mainApp').style.display = 'none';
+  // Pre-fill
+  document.getElementById('setupSid').value = localStorage.getItem('dc_sid') || '';
+  document.getElementById('setupKey').value = localStorage.getItem('dc_key') || '';
+  document.getElementById('setupSecret').value = localStorage.getItem('dc_secret') || '';
+  document.getElementById('setupCaller').value = localStorage.getItem('dc_caller') || '';
+  document.getElementById('setupMobile').value = localStorage.getItem('dc_mobile') || '';
+  document.getElementById('setupPin').value = localStorage.getItem('dc_pin') || '';
+}
+
+function hideSetup() {
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('mainApp').style.display = 'flex';
+}
+
+function saveSetup() {
+  const sid = document.getElementById('setupSid').value.trim();
+  const key = document.getElementById('setupKey').value.trim();
+  const secret = document.getElementById('setupSecret').value.trim();
+  const caller = document.getElementById('setupCaller').value.trim();
+  const mobile = document.getElementById('setupMobile').value.trim();
+  const pin = document.getElementById('setupPin').value.trim();
+  
+  if (!sid || !key || !secret || !caller || !mobile) {
+    alert('Fill in all fields except PIN (optional)'); return;
+  }
+  
+  localStorage.setItem('dc_sid', sid);
+  localStorage.setItem('dc_key', key);
+  localStorage.setItem('dc_secret', secret);
+  localStorage.setItem('dc_caller', caller);
+  localStorage.setItem('dc_mobile', mobile);
+  if (pin) localStorage.setItem('dc_pin', pin);
+  
+  hideSetup();
   document.getElementById('mobileInput').value = mobile;
+  document.getElementById('pinInput').value = pin;
+  setStatus('✅ Setup complete!', 'success');
 }
 
 function skipSetup() {
-  document.getElementById('setupScreen').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'flex';
+  hideSetup();
 }
 
-// ===== KEYPAD =====
 function addDigit(d) {
   if (enteredDigits === '+61') enteredDigits = '+61';
   enteredDigits += d;
@@ -175,198 +208,123 @@ function addDigit(d) {
 }
 
 function deleteDigit() {
-  if (enteredDigits.length > 3) {
-    enteredDigits = enteredDigits.slice(0, -1);
-  }
+  if (enteredDigits.length > 3) enteredDigits = enteredDigits.slice(0, -1);
   if (enteredDigits === '+61' || enteredDigits === '') enteredDigits = '+61';
   updateDisplay();
 }
 
 function updateDisplay() {
-  const displayEl = document.getElementById('display');
-  const placeEl = document.getElementById('placeholder');
+  const d = document.getElementById('display');
+  const p = document.getElementById('placeholder');
   if (enteredDigits === '+61') {
-    displayEl.textContent = '+61';
-    placeEl.textContent = '  4XX XXX XXX';
+    d.textContent = '+61';
+    p.textContent = '  4XX XXX XXX';
   } else {
-    displayEl.textContent = enteredDigits;
-    placeEl.textContent = '';
+    d.textContent = enteredDigits;
+    p.textContent = '';
   }
-  // Save mobile as you type
   if (enteredDigits.length > 5) {
     document.getElementById('mobileInput').value = enteredDigits;
-    localStorage.setItem('dialer_mobile', enteredDigits);
+    localStorage.setItem('dc_mobile', enteredDigits);
   }
 }
 
-// ===== CALL =====
 async function makeCall() {
   const destination = document.getElementById('display').textContent;
-  const mobile = document.getElementById('mobileInput').value.trim() || localStorage.getItem('dialer_mobile');
-  const pin = document.getElementById('pinInput').value || localStorage.getItem('dialer_pin');
+  const mobile = document.getElementById('mobileInput').value.trim() || localStorage.getItem('dc_mobile');
+  const pin = document.getElementById('pinInput').value || localStorage.getItem('dc_pin');
+  const sid = localStorage.getItem('dc_sid');
+  const key = localStorage.getItem('dc_key');
+  const secret = localStorage.getItem('dc_secret');
+  const caller = localStorage.getItem('dc_caller');
   
+  if (!sid || !key || !secret || !caller) {
+    setStatus('⚠️ Setup required — tap ⚙️', 'error');
+    showSetup(); return;
+  }
   if (destination === '+61' || destination.length < 6) {
-    setStatus('Enter a number first', 'error'); return;
+    setStatus('Enter a number', 'error'); return;
   }
   if (!mobile || mobile.length < 6) {
-    setStatus('Set your mobile number first', 'error');
-    document.getElementById('setupScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    return;
+    setStatus('Set your mobile in settings ⚙️', 'error'); return;
   }
   
-  // Save
-  localStorage.setItem('dialer_mobile', mobile);
-  if (pin) localStorage.setItem('dialer_pin', pin);
+  const savedPin = localStorage.getItem('dc_pin');
+  if (savedPin && savedPin !== '0000' && pin !== savedPin) {
+    setStatus('❌ Wrong PIN', 'error'); return;
+  }
+  
+  localStorage.setItem('dc_mobile', mobile);
+  if (pin) localStorage.setItem('dc_pin', pin);
   
   const btn = document.getElementById('callBtn');
-  btn.disabled = true;
-  btn.textContent = '...';
-  setStatus('Initiating call...', 'calling');
+  btn.disabled = true; btn.textContent = '...';
+  setStatus('Calling...', 'calling');
   
-  const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Connecting your call</Say><Dial callerId="${CALLER_ID}">${destination}</Dial></Response>`;
-  
-  const formBody = new URLSearchParams({
-    To: mobile,
-    From: CALLER_ID,
-    Twiml: twiml
-  });
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Connecting your call</Say><Dial callerId="${caller}">${destination}</Dial></Response>`;
   
   try {
-    const resp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT_SID}/Calls.json`, {
+    const resp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Calls.json`, {
       method: 'POST',
       headers: {
-        'Authorization': 'Basic ' + btoa(`${API_KEY}:${API_SECRET}`),
+        'Authorization': 'Basic ' + btoa(`${key}:${secret}`),
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: formBody
+      body: new URLSearchParams({ To: mobile, From: caller, Twiml: twiml })
     });
     const data = await resp.json();
     if (data.sid) {
-      setStatus('✅ Answer your phone! Connecting...', 'success');
-      addRecent(destination);
-      renderRecent();
+      setStatus('✅ Answer your phone!', 'success');
+      addRecent(destination); renderRecent();
     } else {
-      setStatus('❌ ' + (data.message || 'Failed. Check console.'), 'error');
-      console.error('Twilio error:', data);
+      setStatus('❌ ' + (data.message || 'Failed'), 'error');
+      console.error('Twilio:', data);
     }
   } catch(e) {
-    setStatus('❌ Network error: ' + e.message, 'error');
-    console.error(e);
+    setStatus('❌ ' + e.message, 'error');
   }
-  
-  btn.disabled = false;
-  btn.textContent = '📞 CALL';
+  btn.disabled = false; btn.textContent = '📞 CALL';
 }
 
-function setStatus(msg, type) {
-  const el = document.getElementById('status');
-  el.textContent = msg;
-  el.className = 'status ' + (type || '');
+function setStatus(m,t) {
+  const e = document.getElementById('status');
+  e.textContent = m; e.className = 'status ' + (t||'');
 }
 
-// ===== CONTACTS =====
-function getContacts() {
-  try { return JSON.parse(localStorage.getItem('dialer_contacts')) || []; }
-  catch(e) { return []; }
-}
-
-function saveContacts(contacts) {
-  localStorage.setItem('dialer_contacts', JSON.stringify(contacts));
-  renderContacts();
-}
-
+// Contacts
+function getContacts() { try { return JSON.parse(localStorage.getItem('dc_contacts'))||[]; } catch(e) { return []; } }
+function saveContacts(c) { localStorage.setItem('dc_contacts', JSON.stringify(c)); renderContacts(); }
 function renderContacts() {
-  const container = document.getElementById('contactsList');
-  const contacts = getContacts();
-  if (contacts.length === 0) {
-    container.innerHTML = '<div class="empty">No saved contacts</div>';
-    return;
-  }
-  container.innerHTML = contacts.map((c, i) => `
-    <div class="contact-item">
-      <div class="contact-info" onclick="dialSaved('${escAttr(c.number)}')">
-        <div class="contact-name">${esc(c.name)}</div>
-        <div class="contact-number">${esc(c.number)}</div>
-      </div>
-      <button class="contact-call" onclick="event.stopPropagation();dialSaved('${escAttr(c.number)}')">📞</button>
-      <button class="contact-del" onclick="event.stopPropagation();deleteContact(${i})">✕</button>
-    </div>`).join('');
+  const ct = document.getElementById('contactsList');
+  const cs = getContacts();
+  ct.innerHTML = cs.length === 0 ? '<div class="empty">No saved contacts</div>' :
+    cs.map((c,i) => `<div class="contact-item"><div class="contact-info" onclick="dialSaved('${escAttr(c.number)}')"><div class="contact-name">${esc(c.name)}</div><div class="contact-number">${esc(c.number)}</div></div><button class="contact-call" onclick="event.stopPropagation();dialSaved('${escAttr(c.number)}')">📞</button><button class="contact-del" onclick="event.stopPropagation();deleteContact(${i})">✕</button></div>`).join('');
 }
-
-function renderRecent() {
-  const container = document.getElementById('recentList');
-  const recent = getRecent();
-  if (recent.length === 0) {
-    container.innerHTML = '<div class="empty">No recent calls</div>';
-    return;
-  }
-  container.innerHTML = recent.map(r => {
-    const d = new Date(r.time);
-    const ts = d.toLocaleString('en-AU', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'});
-    return `<div class="contact-item" onclick="dialSaved('${escAttr(r.number)}')">
-      <div class="contact-info">
-        <div class="contact-name">${esc(r.number)}</div>
-        <div class="contact-number">${ts}</div>
-      </div>
-      <button class="contact-call" onclick="event.stopPropagation();dialSaved('${escAttr(r.number)}')">📞</button>
-    </div>`;
-  }).join('');
-}
-
-function getRecent() {
-  try { return JSON.parse(localStorage.getItem('dialer_recent')) || []; }
-  catch(e) { return []; }
-}
-
+function getRecent() { try { return JSON.parse(localStorage.getItem('dc_recent'))||[]; } catch(e) { return []; } }
 function addRecent(num) {
-  let recent = getRecent().filter(r => r.number !== num);
-  recent.unshift({ number: num, time: Date.now() });
-  if (recent.length > 10) recent = recent.slice(0, 10);
-  localStorage.setItem('dialer_recent', JSON.stringify(recent));
+  let r = getRecent().filter(x => x.number !== num);
+  r.unshift({number:num,time:Date.now()});
+  if (r.length>10) r=r.slice(0,10);
+  localStorage.setItem('dc_recent', JSON.stringify(r));
 }
-
-function dialSaved(num) {
-  enteredDigits = num;
-  updateDisplay();
-  makeCall();
+function renderRecent() {
+  const ct = document.getElementById('recentList');
+  const rs = getRecent();
+  ct.innerHTML = rs.length === 0 ? '<div class="empty">No recent calls</div>' :
+    rs.map(r => `<div class="contact-item" onclick="dialSaved('${escAttr(r.number)}')"><div class="contact-info"><div class="contact-name">${esc(r.number)}</div><div class="contact-number">${new Date(r.time).toLocaleString('en-AU',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})}</div></div><button class="contact-call" onclick="event.stopPropagation();dialSaved('${escAttr(r.number)}')">📞</button></div>`).join('');
 }
-
+function dialSaved(n) { enteredDigits=n; updateDisplay(); makeCall(); }
 function addContact() {
-  const name = prompt('Contact name:');
-  if (!name) return;
-  const num = prompt('Phone number (with country code):', '+61');
-  if (!num) return;
-  const contacts = getContacts();
-  contacts.push({ name, number: num });
-  contacts.sort((a,b) => a.name.localeCompare(b.name));
-  saveContacts(contacts);
+  const n=prompt('Name:'); if(!n) return;
+  const u=prompt('Number (+61...):','+61'); if(!u) return;
+  const cs=getContacts(); cs.push({name:n,number:u}); cs.sort((a,b)=>a.name.localeCompare(b.name)); saveContacts(cs);
 }
+function deleteContact(i) { if(!confirm('Delete?')) return; const cs=getContacts(); cs.splice(i,1); saveContacts(cs); }
+function esc(s) { const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'\\"'); }
 
-function deleteContact(i) {
-  if (!confirm('Delete this contact?')) return;
-  const contacts = getContacts();
-  contacts.splice(i, 1);
-  saveContacts(contacts);
-}
-
-function esc(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-function escAttr(s) {
-  return s.replace(/'/g, "\\'").replace(/"/g, '\\"');
-}
-
-// ===== INIT =====
 init();
-
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+navigator.serviceWorker?.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
